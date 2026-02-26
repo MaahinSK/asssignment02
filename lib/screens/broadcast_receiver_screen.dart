@@ -19,68 +19,89 @@ class _BroadcastReceiverScreenState extends State<BroadcastReceiverScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(24.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Text(
-            'Select Broadcast Operation:',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 20),
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final padding = EdgeInsets.symmetric(
+      horizontal: screenWidth * 0.05,
+      vertical: screenHeight * 0.03,
+    );
 
-          // Spinner (Dropdown)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.indigo),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                value: _selectedOption,
-                isExpanded: true,
-                items: _options.map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() => _selectedOption = newValue!);
-                },
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: padding,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'Select Broadcast Operation:',
+              style: TextStyle(
+                fontSize: screenWidth * 0.05, // scales with screen width
+                fontWeight: FontWeight.bold,
               ),
             ),
-          ),
+            SizedBox(height: screenHeight * 0.02),
 
-          const SizedBox(height: 30),
-
-          // Proceed Button
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.indigo,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 14),
+            // Spinner (Dropdown)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.indigo),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  value: _selectedOption,
+                  isExpanded: true,
+                  items: _options.map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(
+                        value,
+                        style: TextStyle(fontSize: screenWidth * 0.04),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() => _selectedOption = newValue!);
+                  },
+                ),
+              ),
             ),
-            onPressed: () {
-              if (_selectedOption == 'Custom Broadcast Receiver') {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const CustomBroadcastInputScreen(),
-                  ),
-                );
-              } else {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const BatteryScreen()),
-                );
-              }
-            },
-            child: const Text('Proceed', style: TextStyle(fontSize: 16)),
-          ),
-        ],
+
+            SizedBox(height: screenHeight * 0.03),
+
+            // Proceed Button
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.indigo,
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              onPressed: () {
+                if (_selectedOption == 'Custom Broadcast Receiver') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const CustomBroadcastInputScreen(),
+                    ),
+                  );
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const BatteryScreen()),
+                  );
+                }
+              },
+              child: Text(
+                'Proceed',
+                style: TextStyle(fontSize: screenWidth * 0.045),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

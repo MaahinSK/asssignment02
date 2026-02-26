@@ -51,57 +51,76 @@ class _BatteryScreenState extends State<BatteryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Battery Receiver'),
         backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
       ),
-      body: Center(
-        child: _loading
-            ? const CircularProgressIndicator()
-            : Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.battery_full,
-                  size: 100, color: _getBatteryColor()),
-              const SizedBox(height: 20),
-              Text(
-                '$_batteryLevel%',
-                style: TextStyle(
-                    fontSize: 60,
-                    fontWeight: FontWeight.bold,
-                    color: _getBatteryColor()),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'Status: ${_getBatteryStateText()}',
-                style: const TextStyle(fontSize: 20),
-              ),
-              const SizedBox(height: 30),
-              // Battery bar
-              ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: LinearProgressIndicator(
-                  value: _batteryLevel / 100,
-                  minHeight: 20,
-                  backgroundColor: Colors.grey.shade300,
+      body: SafeArea(
+        child: Center(
+          child: _loading
+              ? const CircularProgressIndicator()
+              : SingleChildScrollView(
+            padding: EdgeInsets.all(screenWidth * 0.05),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.battery_full,
+                  size: screenWidth * 0.2,
                   color: _getBatteryColor(),
                 ),
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton.icon(
-                onPressed: _getBatteryInfo,
-                icon: const Icon(Icons.refresh),
-                label: const Text('Refresh'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.indigo,
-                  foregroundColor: Colors.white,
+                SizedBox(height: screenHeight * 0.02),
+                Text(
+                  '$_batteryLevel%',
+                  style: TextStyle(
+                    fontSize: screenWidth * 0.15,
+                    fontWeight: FontWeight.bold,
+                    color: _getBatteryColor(),
+                  ),
                 ),
-              ),
-            ],
+                SizedBox(height: screenHeight * 0.01),
+                Text(
+                  'Status: ${_getBatteryStateText()}',
+                  style: TextStyle(fontSize: screenWidth * 0.05),
+                ),
+                SizedBox(height: screenHeight * 0.03),
+                // Battery bar
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: LinearProgressIndicator(
+                    value: _batteryLevel / 100,
+                    minHeight: screenHeight * 0.02,
+                    backgroundColor: Colors.grey.shade300,
+                    color: _getBatteryColor(),
+                  ),
+                ),
+                SizedBox(height: screenHeight * 0.03),
+                ElevatedButton.icon(
+                  onPressed: _getBatteryInfo,
+                  icon: const Icon(Icons.refresh),
+                  label: Text(
+                    'Refresh',
+                    style: TextStyle(fontSize: screenWidth * 0.04),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.indigo,
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: screenWidth * 0.05,
+                      vertical: screenHeight * 0.015,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

@@ -13,6 +13,8 @@ class _AudioScreenState extends State<AudioScreen> {
   PlayerState _playerState = PlayerState.stopped;
   Duration _duration = Duration.zero;
   Duration _position = Duration.zero;
+  bool _isLoading = false;
+  String? _errorMessage;
 
   // Free sample audio URL
   final String _audioUrl =
@@ -22,16 +24,30 @@ class _AudioScreenState extends State<AudioScreen> {
   void initState() {
     super.initState();
 
+    // Set audio context (platform-neutral)
+    _audioPlayer.setAudioContext(const AudioContext());
+
     _audioPlayer.onPlayerStateChanged.listen((state) {
-      setState(() => _playerState = state);
+      if (mounted) {
+        setState(() {
+          _playerState = state;
+          if (state == PlayerState.playing || state == PlayerState.paused) {
+            _isLoading = false;
+          }
+        });
+      }
     });
 
     _audioPlayer.onDurationChanged.listen((duration) {
-      setState(() => _duration = duration);
+      if (mounted) setState(() => _duration = duration);
     });
 
     _audioPlayer.onPositionChanged.listen((position) {
-      setState(() => _position = position);
+      if (mounted) setState(() => _position = position);
+    });
+
+    _audioPlayer.onLog.listen((message) {
+      debugPrint('AudioPlayer Log: $message');
     });
   }
 
@@ -46,6 +62,31 @@ class _AudioScreenState extends State<AudioScreen> {
     return '${twoDigits(d.inMinutes)}:${twoDigits(d.inSeconds.remainder(60))}';
   }
 
+  Future<void> _handlePlay() async {
+    try {
+      setState(() {
+        _isLoading = true;
+        _errorMessage = null;
+      });
+
+      if (_playerState == PlayerState.playing) {
+        await _audioPlayer.pause();
+      } else {
+        // Using setSource + resume for more reliable loading
+        await _audioPlayer.setSource(UrlSource(_audioUrl));
+        await _audioPlayer.resume();
+      }
+    } catch (e) {
+      debugPrint('Error playing audio: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _errorMessage = 'Failed to load audio. Please check your connection.';
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -54,7 +95,7 @@ class _AudioScreenState extends State<AudioScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Album art placeholder
+            // Album
             Container(
               width: 200,
               height: 200,
@@ -62,7 +103,9 @@ class _AudioScreenState extends State<AudioScreen> {
                 color: Colors.indigo.shade100,
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: const Icon(Icons.music_note, size: 100, color: Colors.indigo),
+              child: _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : const Icon(Icons.music_note, size: 100, color: Colors.indigo),
             ),
             const SizedBox(height: 24),
 
@@ -71,6 +114,17 @@ class _AudioScreenState extends State<AudioScreen> {
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             const Text('Sample Audio', style: TextStyle(color: Colors.grey)),
+            
+            if (_errorMessage != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: Text(
+                  _errorMessage!,
+                  style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              
             const SizedBox(height: 20),
 
             // Seek bar
@@ -96,7 +150,7 @@ class _AudioScreenState extends State<AudioScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
 
             // Controls
             Row(
@@ -107,26 +161,36 @@ class _AudioScreenState extends State<AudioScreen> {
                 //   icon: const Icon(Icons.stop_circle_outlined),
                 //   iconSize: 44,
                 //   color: Colors.red,
-                //   onPressed: () => _audioPlayer.stop(),
+                //   onPressed: () {
+                //     _audioPlayer.stop();
+                //     setState(() => _isLoading = false);
+                //   },
                 // ),
 
                 // Play/Pause button
-                IconButton(
-                  iconSize: 72,
-                  icon: Icon(
-                    _playerState == PlayerState.playing
-                        ? Icons.pause_circle
-                        : Icons.play_circle,
-                    color: Colors.indigo,
-                  ),
-                  onPressed: () async {
-                    if (_playerState == PlayerState.playing) {
-                      await _audioPlayer.pause();
-                    } else {
-                      await _audioPlayer.play(UrlSource(_audioUrl));
-                    }
-                  },
+                const SizedBox(width: 16),
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    if (_isLoading)
+                      const SizedBox(
+                        width: 72,
+                        height: 72,
+                        child: CircularProgressIndicator(strokeWidth: 4),
+                      ),
+                    IconButton(
+                      iconSize: 72,
+                      icon: Icon(
+                        _playerState == PlayerState.playing
+                            ? Icons.pause_circle
+                            : Icons.play_circle,
+                        color: Colors.indigo,
+                      ),
+                      onPressed: _isLoading ? null : _handlePlay,
+                    ),
+                  ],
                 ),
+                const SizedBox(width: 16),
 
                 // Replay button
                 IconButton(
@@ -135,7 +199,7 @@ class _AudioScreenState extends State<AudioScreen> {
                   color: Colors.indigo,
                   onPressed: () async {
                     await _audioPlayer.seek(Duration.zero);
-                    await _audioPlayer.play(UrlSource(_audioUrl));
+                    _handlePlay();
                   },
                 ),
               ],
