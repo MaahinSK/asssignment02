@@ -1,0 +1,65 @@
+============================================================
+           AI USAGE DECLARATION
+============================================================
+
+Name: Maahin Sikder
+Student ID: 22201384
+Assignment: 2
+Date: 2/26/2026
+
+------------------------------------------------------------
+1. AI TOOLS USED (check all that apply)
+------------------------------------------------------------
+[ ] None
+[ ] ChatGPT
+[ ] GitHub Copilot
+[ ] Google Gemini
+[x] Claude
+[ ] Cursor
+[ ] Other: ________deepseek________
+
+------------------------------------------------------------
+2. PURPOSE OF AI USE (check all that apply)
+------------------------------------------------------------
+[x] Learning/understanding concepts
+[x] Debugging my code
+[ ] Generating code snippets
+[ ] Writing text content
+[ ] Design/styling ideas
+[ ] Image generation
+[ ] Other: ________________
+
+------------------------------------------------------------
+3. DESCRIPTION OF AI USE
+------------------------------------------------------------
+Briefly describe what you used AI for and how:
+
+initially used to learn more about dart and certain parts of how flutter works 
+then used to fix the code for a page which was not working well in landscape mode 
+
+
+
+------------------------------------------------------------
+4. AI-ASSISTED SECTIONS
+------------------------------------------------------------
+List specific files/sections where AI helped significantly:
+
+File: _________image_scale_screen.dart________ Section: ______image viewing page___________
+File: _________________ Section: _________________
+File: _________________ Section: _________________
+
+------------------------------------------------------------
+5. DECLARATION
+------------------------------------------------------------
+I declare that:
+- This disclosure is complete and accurate
+- I understand all code in my submission
+- I can explain and modify my work if asked
+- I take full responsibility for my submission
+
+Signature: ________maahin______
+Date: _______2/26/26_______
+
+============================================================
+Save as: docs/AI_Declaration.txt
+============================================================
